@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трилайф — токарная и фрезерная обработка металла на заказ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#121417;
+    --bg-1:#1a1d22;
+    --bg-2:#20242a;
+    --line:#2f343c;
+    --line-strong:#454c56;
+    --steel:#8b93a0;
+    --silver:#c8cfd7;
+    --white:#f2f4f6;
+    --blue:#4f86c6;
+    --blue-dim:#2c4664;
+    --orange:#ff6a13;
+    --orange-dim:#4a2c14;
+    --radius-s: 2px;
+    --maxw: 1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg-0);
+    color:var(--silver);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block; max-width:100%;}
+  a{color:inherit;}
+  h1,h2,h3{
+    font-family:'Oswald', sans-serif;
+    color:var(--white);
+    margin:0;
+    font-weight:600;
+    letter-spacing:0.2px;
+  }
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.02em;
+  }
+  .wrap{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:0 28px;
+  }
+  ::selection{ background:var(--orange); color:#1a1d22; }
+  :focus-visible{
+    outline:2px solid var(--orange);
+    outline-offset:3px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+
+  /* ---------- corner registration marks (blueprint sheet) ---------- */
+  .frame-marks{
+    position:relative;
+  }
+  .frame-marks::before,
+  .frame-marks::after{
+    content:"";
+    position:absolute;
+    width:22px;
+    height:22px;
+    top:14px;
+    border-top:1.5px solid var(--line-strong);
+  }
+  .frame-marks::before{
+    left:14px;
+    border-left:1.5px solid var(--line-strong);
+  }
+  .frame-marks::after{
+    right:14px;
+    border-right:1.5px solid var(--line-strong);
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(18,20,23,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:72px;
+  }
+  .logo{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    font-family:'Oswald', sans-serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--white);
+    text-decoration:none;
+  }
+  .logo .dot{ color:var(--orange); }
+  .logo small{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    font-weight:400;
+    color:var(--steel);
+  }
+  .nav-links{
+    display:flex;
+    gap:32px;
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .nav-links a{
+    text-decoration:none;
+    color:var(--steel);
+    font-size:14.5px;
+    transition:color .15s ease;
+    padding:4px 0;
+    border-bottom:1px solid transparent;
+  }
+  .nav-links a:hover{ color:var(--white); border-bottom-color:var(--blue); }
+  .nav-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--orange);
+    color:#1a1104;
+    font-weight:600;
+    font-size:14px;
+    padding:10px 18px;
+    text-decoration:none;
+    border-radius:var(--radius-s);
+    transition:background .15s ease;
+  }
+  .nav-cta:hover{ background:#ff7d33; }
+  .burger{ display:none; }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    font-weight:600;
+    padding:14px 26px;
+    text-decoration:none;
+    border-radius:var(--radius-s);
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:all .15s ease;
+  }
+  .btn-primary{
+    background:var(--orange);
+    color:#1a1104;
+  }
+  .btn-primary:hover{ background:#ff7d33; }
+  .btn-ghost{
+    background:transparent;
+    color:var(--silver);
+    border-color:var(--line-strong);
+  }
+  .btn-ghost:hover{ border-color:var(--blue); color:var(--white); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    padding:88px 0 64px;
+    overflow:hidden;
+    background:
+      linear-gradient(180deg, rgba(79,134,198,0.05), transparent 40%),
+      var(--bg-0);
+  }
+  .hero-grid-bg{
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:44px 44px;
+    opacity:0.35;
+    mask-image:radial-gradient(ellipse 90% 60% at 60% 20%, black 10%, transparent 75%);
+  }
+  .hero-inner{
+    position:relative;
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:40px;
+    align-items:center;
+  }
+  .eyebrow-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--blue);
+    border:1px solid var(--blue-dim);
+    padding:5px 10px;
+    border-radius:var(--radius-s);
+    margin-bottom:22px;
+  }
+  .eyebrow-tag .sw{ width:6px; height:6px; background:var(--orange); border-radius:50%; }
+  .hero h1{
+    font-size:clamp(34px, 4.4vw, 54px);
+    line-height:1.08;
+    max-width:620px;
+  }
+  .hero h1 .accent{ color:var(--blue); }
+  .hero p.lead{
+    margin-top:20px;
+    max-width:490px;
+    font-size:17px;
+    color:var(--steel);
+  }
+  .hero-actions{
+    display:flex;
+    gap:14px;
+    margin-top:32px;
+    flex-wrap:wrap;
+  }
+  .hero-stats{
+    display:grid;
+    grid-template-columns:repeat(4, auto);
+    gap:0;
+    margin-top:48px;
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    max-width:560px;
+  }
+  .stat{
+    padding-right:20px;
+    border-right:1px solid var(--line);
+  }
+  .stat:last-child{ border-right:none; }
+  .stat b{
+    display:block;
+    font-family:'Oswald', sans-serif;
+    color:var(--white);
+    font-size:22px;
+    font-weight:600;
+  }
+  .stat span{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--steel);
+  }
+
+  /* hero technical drawing */
+  .part-drawing{
+    position:relative;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:26px 22px 20px;
+    overflow:hidden;
+    cursor:crosshair;
+  }
+  .part-drawing .dwg-head{
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--steel);
+    border-bottom:1px solid var(--line);
+    padding-bottom:10px;
+    margin-bottom:14px;
+  }
+  .part-drawing svg{ width:100%; height:auto; }
+  .dwg-foot{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--steel);
+  }
+  .dwg-foot b{ display:block; color:var(--silver); font-size:12.5px; margin-bottom:2px; }
+
+  /* ================================================================
+     DRAWING ANIMATIONS
+     Every moving part answers a real machining action:
+     draw-in = CAD tracing a line · spin = chuck/spindle rotating ·
+     sweep = tool traverse · scan = inspection pass · shine = machined finish
+     ================================================================ */
+
+  /* metallic light sweep across the drawing card on hover */
+  .shine{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(115deg, transparent 42%, rgba(111,168,220,0.16) 50%, transparent 58%);
+    transform:translateX(-130%);
+    transition:transform 1s cubic-bezier(.2,.7,.3,1);
+    z-index:2;
+  }
+  .part-drawing:hover .shine,
+  .cap-visual:hover .shine{ transform:translateX(130%); }
+
+  /* dimension / extension lines trace themselves in, like a pen plotting a CAD view */
+  .dwg-svg .dim-draw{
+    stroke-dasharray:100;
+    stroke-dashoffset:100;
+    transition:stroke-dashoffset .6s ease;
+  }
+  .part-drawing:hover .dwg-svg .dim-draw,
+  .cap-visual:hover .dwg-svg .dim-draw{ stroke-dashoffset:0; }
+  .dwg-svg .d1{ transition-delay:.02s; }
+  .dwg-svg .d2{ transition-delay:.10s; }
+  .dwg-svg .d3{ transition-delay:.18s; }
+  .dwg-svg .d4{ transition-delay:.26s; }
+  .dwg-svg .d5{ transition-delay:.34s; }
+  .dwg-svg .d6{ transition-delay:.42s; }
+
+  /* orange leader lines + their diameter callouts arrive just after the dimensions */
+  .dwg-svg .leader-draw{
+    stroke-dasharray:100;
+    stroke-dashoffset:100;
+    transition:stroke-dashoffset .45s ease .5s;
+  }
+  .part-drawing:hover .dwg-svg .leader-draw,
+  .cap-visual:hover .dwg-svg .leader-draw{ stroke-dashoffset:0; }
+  .dwg-svg .label-fade{
+    opacity:0;
+    transform:translateY(4px);
+    transition:opacity .4s ease .68s, transform .4s ease .68s;
+  }
+  .part-drawing:hover .dwg-svg .label-fade,
+  .cap-visual:hover .dwg-svg .label-fade{ opacity:1; transform:translateY(0); }
+
+  /* the workpiece spins in the chuck; the mill bit spins on its spindle */
+  .dwg-svg .spin-part, .dwg-svg .spin-tool{
+    transform-box:fill-box;
+    transform-origin:50% 50%;
+    animation-play-state:paused;
+  }
+  .dwg-svg .spin-part{ animation:spin-cw 3.2s linear infinite; }
+  .dwg-svg .spin-tool{ animation:spin-cw 0.55s linear infinite; }
+  .part-drawing:hover .dwg-svg .spin-part,
+  .cap-visual:hover .dwg-svg .spin-part,
+  .part-drawing:hover .dwg-svg .spin-tool,
+  .cap-visual:hover .dwg-svg .spin-tool{ animation-play-state:running; }
+  @keyframes spin-cw{ to{ transform:rotate(360deg); } }
+
+  /* turning: carriage + tool traverses the workpiece, cutting */
+  .dwg-svg .tool-travel{
+    transform-box:fill-box;
+    animation:travel 1.8s ease-in-out infinite;
+    animation-play-state:paused;
+  }
+  .cap-visual:hover .dwg-svg .tool-travel{ animation-play-state:running; }
+  @keyframes travel{
+    0%,100%{ transform:translateX(0); }
+    50%{ transform:translateX(-150px); }
+  }
+
+  /* milling: spindle plunges into the material */
+  .dwg-svg .plunge{
+    transform-box:fill-box;
+    animation:plunge-y 1.4s ease-in-out infinite;
+    animation-play-state:paused;
+  }
+  .cap-visual:hover .dwg-svg .plunge{ animation-play-state:running; }
+  @keyframes plunge-y{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(10px); }
+  }
+
+  /* inspection beam sweeps the part, echoing the QC section */
+  .dwg-svg .scan-beam{
+    opacity:0;
+    transform-box:fill-box;
+    animation:scan-y 2.4s linear infinite;
+    animation-play-state:paused;
+  }
+  .part-drawing:hover .dwg-svg .scan-beam,
+  .cap-visual:hover .dwg-svg .scan-beam{ animation-play-state:running; }
+  @keyframes scan-y{
+    0%{ opacity:0; transform:translateY(0); }
+    8%{ opacity:.9; }
+    92%{ opacity:.9; }
+    100%{ opacity:0; transform:translateY(var(--scan-h, 200px)); }
+  }
+
+  /* hero entrance — one orchestrated reveal, not repeated per-section */
+  .hero .eyebrow-tag, .hero h1, .hero p.lead, .hero-actions, .hero-stats, .hero .part-drawing{
+    opacity:0;
+    animation:hero-in .7s cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  .hero .eyebrow-tag{ animation-delay:.05s; }
+  .hero h1{ animation-delay:.14s; }
+  .hero p.lead{ animation-delay:.24s; }
+  .hero-actions{ animation-delay:.34s; }
+  .hero-stats{ animation-delay:.44s; }
+  .hero .part-drawing{ animation-delay:.22s; }
+  @keyframes hero-in{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* fleet table: accent bar grows in on row hover */
+  .fleet-table td.name{ position:relative; }
+  .fleet-table td.name::before{
+    content:"";
+    position:absolute;
+    left:0; top:8px; bottom:8px;
+    width:3px;
+    background:var(--orange);
+    transform:scaleY(0);
+    transform-origin:bottom;
+    transition:transform .3s ease;
+  }
+  .fleet-table tr:hover td.name::before{ transform:scaleY(1); transform-origin:top; }
+  .fleet-table td.mono{ transition:color .25s ease; }
+  .fleet-table tr:hover td.mono{ color:var(--blue); }
+
+  /* tolerance panel rows reveal on scroll, staggered once */
+  .tol-row{
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .quality-panel.in-view .tol-row{ opacity:1; transform:translateY(0); }
+  .quality-panel.in-view .tol-row:nth-child(1){ transition-delay:.02s; }
+  .quality-panel.in-view .tol-row:nth-child(2){ transition-delay:.09s; }
+  .quality-panel.in-view .tol-row:nth-child(3){ transition-delay:.16s; }
+  .quality-panel.in-view .tol-row:nth-child(4){ transition-delay:.23s; }
+  .quality-panel.in-view .tol-row:nth-child(5){ transition-delay:.30s; }
+  .quality-panel.in-view .tol-row:nth-child(6){ transition-delay:.37s; }
+
+  @media (prefers-reduced-motion: reduce){
+    .dwg-svg .spin-part, .dwg-svg .spin-tool, .dwg-svg .tool-travel,
+    .dwg-svg .plunge, .dwg-svg .scan-beam,
+    .hero .eyebrow-tag, .hero h1, .hero p.lead, .hero-actions, .hero-stats, .hero .part-drawing{
+      animation:none !important;
+      opacity:1 !important;
+      transform:none !important;
+    }
+  }
+
+  /* ---------- section shell ---------- */
+  section{ padding:90px 0; }
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    margin-bottom:52px;
+    flex-wrap:wrap;
+  }
+  .section-head .kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--blue);
+    margin-bottom:10px;
+    display:block;
+  }
+  .section-head h2{
+    font-size:clamp(26px, 3vw, 36px);
+    max-width:560px;
+  }
+  .section-head p{
+    max-width:420px;
+    color:var(--steel);
+    font-size:15px;
+    margin:0;
+  }
+  .divider{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:0;
+  }
+
+  /* ---------- capabilities (turning / milling) ---------- */
+  .cap{
+    display:grid;
+    grid-template-columns:0.9fr 1.1fr;
+    gap:56px;
+    align-items:center;
+    padding:56px 0;
+  }
+  .cap + .cap{ border-top:1px solid var(--line); }
+  .cap.reverse .cap-visual{ order:2; }
+  .cap.reverse .cap-text{ order:1; }
+  .cap-visual{
+    position:relative;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:24px;
+    overflow:hidden;
+    cursor:crosshair;
+  }
+  .cap-visual svg{ width:100%; height:auto; }
+  .cap-num{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--orange);
+    font-size:13px;
+    margin-bottom:10px;
+    display:block;
+  }
+  .cap-text h3{
+    font-size:28px;
+    margin-bottom:14px;
+  }
+  .cap-text > p{
+    color:var(--steel);
+    font-size:15.5px;
+    max-width:480px;
+    margin-bottom:24px;
+  }
+  .leader-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .leader-list li{
+    position:relative;
+    padding:12px 0 12px 26px;
+    border-top:1px solid var(--line);
+    font-size:14.5px;
+    color:var(--silver);
+  }
+  .leader-list li:last-child{ border-bottom:1px solid var(--line); }
+  .leader-list li::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:20px;
+    width:14px;
+    height:1px;
+    background:var(--blue);
+  }
+  .leader-list li::after{
+    content:"";
+    position:absolute;
+    left:0;
+    top:16px;
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:var(--orange);
+  }
+  .leader-list b{ color:var(--white); font-weight:600; }
+
+  /* ---------- fleet table (machine park) ---------- */
+  .fleet{ background:var(--bg-1); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .fleet-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  .fleet-table thead th{
+    text-align:left;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:400;
+    font-size:11.5px;
+    color:var(--steel);
+    padding:0 16px 14px;
+    border-bottom:1px solid var(--line-strong);
+    white-space:nowrap;
+  }
+  .fleet-table tbody td{
+    padding:18px 16px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  .fleet-table tbody tr:hover{ background:rgba(79,134,198,0.05); }
+  .fleet-table td.name{ color:var(--white); font-weight:600; font-family:'Oswald',sans-serif; font-size:16px; }
+  .fleet-table td.type{ color:var(--blue); font-family:'IBM Plex Mono', monospace; font-size:12.5px; }
+  .fleet-table td.mono{ font-family:'IBM Plex Mono', monospace; color:var(--silver); font-size:13.5px; }
+  .fleet-table td.desc{ color:var(--steel); font-size:13.5px; max-width:230px; }
+  .table-scroll{ overflow-x:auto; }
+
+  /* ---------- process ---------- */
+  .process-row{
+    display:grid;
+    grid-template-columns:repeat(6, 1fr);
+    gap:0;
+  }
+  .pstep{
+    position:relative;
+    padding:0 18px 0 0;
+    border-right:1px solid var(--line);
+  }
+  .pstep:last-child{ border-right:none; padding-right:0; }
+  .pstep .pnum{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--orange);
+    display:block;
+    margin-bottom:14px;
+  }
+  .pstep h4{
+    font-family:'Oswald', sans-serif;
+    color:var(--white);
+    font-size:16.5px;
+    font-weight:600;
+    margin:0 0 8px;
+  }
+  .pstep p{
+    font-size:13.3px;
+    color:var(--steel);
+    margin:0;
+  }
+  .process-line{
+    position:relative;
+    height:1px;
+    background:var(--line-strong);
+    margin-bottom:36px;
+  }
+  .process-line span{
+    position:absolute;
+    top:-4px;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:var(--bg-0);
+    border:1.5px solid var(--blue);
+  }
+
+  /* ---------- materials ---------- */
+  .material-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .mchip{
+    background:var(--bg-1);
+    padding:22px 20px;
+  }
+  .mchip .code{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--orange);
+    font-size:12px;
+    display:block;
+    margin-bottom:8px;
+  }
+  .mchip .name{
+    color:var(--white);
+    font-weight:600;
+    font-size:15.5px;
+    display:block;
+    margin-bottom:4px;
+  }
+  .mchip .use{
+    color:var(--steel);
+    font-size:13px;
+  }
+
+  /* ---------- quality ---------- */
+  .quality{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:56px;
+    align-items:start;
+  }
+  .quality-text p{ color:var(--steel); font-size:15.5px; max-width:480px; }
+  .qc-list{ list-style:none; margin:24px 0 0; padding:0; display:grid; gap:16px; }
+  .qc-list li{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    font-size:14.5px;
+    color:var(--silver);
+  }
+  .qc-list b{ color:var(--white); display:block; margin-bottom:2px; font-size:15px; }
+  .qc-mark{
+    flex:none;
+    width:20px;
+    height:20px;
+    border:1.5px solid var(--blue);
+    border-radius:50%;
+    position:relative;
+    margin-top:2px;
+  }
+  .qc-mark::before, .qc-mark::after{
+    content:"";
+    position:absolute;
+    background:var(--blue);
+  }
+  .qc-mark::before{ width:8px; height:1.5px; top:9px; left:6px; transform:rotate(45deg); transform-origin:left; }
+  .qc-mark::after{ width:11px; height:1.5px; top:9px; left:9px; transform:rotate(-45deg); transform-origin:left; }
+  .quality-panel{
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:26px;
+  }
+  .tol-row{
+    display:flex;
+    justify-content:space-between;
+    padding:13px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .tol-row:first-child{ padding-top:0; }
+  .tol-row .lbl{ color:var(--steel); }
+  .tol-row .val{ font-family:'IBM Plex Mono', monospace; color:var(--white); }
+
+  /* ---------- cta / contact ---------- */
+  .cta-section{
+    background:var(--bg-1);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .cta-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:64px;
+  }
+  .cta-left h2{ font-size:clamp(26px,3vw,36px); max-width:440px; margin-bottom:16px; }
+  .cta-left p{ color:var(--steel); font-size:15.5px; max-width:420px; margin-bottom:28px; }
+  .contact-block{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    margin-top:8px;
+  }
+  .contact-block a{
+    text-decoration:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .contact-block a span.tag{
+    font-family:'IBM Plex Sans', sans-serif;
+    color:var(--steel);
+    font-size:12.5px;
+    width:76px;
+  }
+  form{
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:28px;
+  }
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--steel);
+    margin-bottom:6px;
+  }
+  .field input, .field textarea{
+    width:100%;
+    background:var(--bg-0);
+    border:1px solid var(--line-strong);
+    border-radius:var(--radius-s);
+    padding:11px 13px;
+    color:var(--white);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14.5px;
+  }
+  .field input:focus, .field textarea:focus{
+    outline:none;
+    border-color:var(--blue);
+  }
+  .field textarea{ resize:vertical; min-height:80px; }
+  .file-drop{
+    border:1px dashed var(--line-strong);
+    border-radius:var(--radius-s);
+    padding:16px;
+    text-align:center;
+    font-size:13px;
+    color:var(--steel);
+    margin-bottom:18px;
+  }
+  .file-drop b{ color:var(--blue); font-weight:500; }
+  .form-note{
+    font-size:12px;
+    color:var(--steel);
+    margin-top:12px;
+  }
+
+  /* ---------- footer ---------- */
+  footer{ padding:48px 0 32px; }
+  .footer-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    padding-bottom:32px;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .footer-cols{
+    display:flex;
+    gap:64px;
+    flex-wrap:wrap;
+  }
+  .footer-col h5{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--steel);
+    font-size:11.5px;
+    font-weight:400;
+    margin:0 0 14px;
+  }
+  .footer-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
+  .footer-col a{ text-decoration:none; color:var(--silver); font-size:14px; }
+  .footer-col a:hover{ color:var(--white); }
+  .footer-bottom{
+    display:flex;
+    justify-content:space-between;
+    padding-top:22px;
+    font-size:12.5px;
+    color:var(--steel);
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 980px){
+    .hero-inner{ grid-template-columns:1fr; }
+    .part-drawing{ order:-1; }
+    .cap{ grid-template-columns:1fr; gap:28px; }
+    .cap.reverse .cap-visual{ order:1; }
+    .cap.reverse .cap-text{ order:2; }
+    .process-row{ grid-template-columns:repeat(3,1fr); row-gap:28px; }
+    .pstep{ border-right:none; }
+    .pstep:nth-child(3n){ border-right:none; }
+    .material-grid{ grid-template-columns:repeat(2,1fr); }
+    .quality{ grid-template-columns:1fr; }
+    .cta-grid{ grid-template-columns:1fr; gap:36px; }
+    .hero-stats{ grid-template-columns:repeat(2,1fr); row-gap:18px; max-width:100%; }
+  }
+  @media (max-width: 720px){
+    .nav-links{ display:none; }
+    .wrap{ padding:0 18px; }
+    section{ padding:64px 0; }
+    .process-row{ grid-template-columns:1fr 1fr; }
+    .fleet-table{ min-width:760px; }
+    .footer-top{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#top" class="logo">ТРИЛАЙФ<span class="dot">.</span><small>мех. обработка</small></a>
+    <ul class="nav-links">
+      <li><a href="#capabilities">Обработка</a></li>
+      <li><a href="#fleet">Оборудование</a></li>
+      <li><a href="#process">Процесс</a></li>
+      <li><a href="#quality">Контроль качества</a></li>
+      <li><a href="#contact">Контакты</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Рассчитать заказ</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero frame-marks">
+    <div class="hero-grid-bg" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <div>
+        <span class="eyebrow-tag"><span class="sw"></span>ТОКАРНАЯ · ФРЕЗЕРНАЯ · КОМПЛЕКСНАЯ ОБРАБОТКА</span>
+        <h1>Точим и фрезеруем детали, которые <span class="accent">встают в сборку с первого раза</span></h1>
+        <p class="lead">Трилайф — контрактное производство полного цикла: от чертежа и программы ЧПУ до готовой партии с протоколом измерений. Работаем с металлом и инженерным пластиком, допуски от ±0,01 мм.</p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary">Рассчитать стоимость детали</a>
+          <a href="#fleet" class="btn btn-ghost">Парк оборудования</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><b>⌀2–500 мм</b><span>ДИАПАЗОН ТОЧЕНИЯ</span></div>
+          <div class="stat"><b>±0,01 мм</b><span>ТОЧНОСТЬ ОБРАБОТКИ</span></div>
+          <div class="stat"><b>5 осей</b><span>ФРЕЗЕРНАЯ ОБРАБОТКА</span></div>
+          <div class="stat"><b>от 1 дня</b><span>ПРОТОТИП / ОБРАЗЕЦ</span></div>
+        </div>
+      </div>
+
+      <div class="part-drawing">
+        <div class="shine" aria-hidden="true"></div>
+        <div class="dwg-head">
+          <span>ЧЕРТЁЖ № TL-0421-A</span>
+          <span>ЛИСТ 1/1 · М 1:1</span>
+        </div>
+        <svg class="dwg-svg" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg" style="--scan-h:230px;">
+          <!-- turned shaft side profile -->
+          <g stroke="#6fa8dc" stroke-width="1.4" fill="none">
+            <rect x="40" y="120" width="60" height="34" />
+            <rect x="100" y="112" width="90" height="50" />
+            <rect x="190" y="128" width="50" height="18" />
+            <rect x="240" y="118" width="80" height="38" />
+            <rect x="320" y="128" width="40" height="18" />
+          </g>
+          <!-- centerline -->
+          <line x1="20" y1="137" x2="380" y2="137" stroke="#454c56" stroke-width="1" stroke-dasharray="6 4"/>
+          <!-- hatching on cut end -->
+          <g stroke="#3a5a78" stroke-width="1">
+            <line x1="42" y1="122" x2="52" y2="132"/>
+            <line x1="42" y1="130" x2="58" y2="146"/>
+            <line x1="42" y1="138" x2="58" y2="154" />
+            <line x1="48" y1="146" x2="58" y2="153" />
+          </g>
+          <!-- dimension lines: trace themselves in on hover -->
+          <g stroke="#8b93a0" stroke-width="1" fill="none">
+            <line class="dim-draw d1" pathLength="100" x1="40" y1="180" x2="100" y2="180"/>
+            <line class="dim-draw d1" pathLength="100" x1="40" y1="174" x2="40" y2="186"/>
+            <line class="dim-draw d1" pathLength="100" x1="100" y1="174" x2="100" y2="186"/>
+            <line class="dim-draw d2" pathLength="100" x1="100" y1="196" x2="190" y2="196"/>
+            <line class="dim-draw d2" pathLength="100" x1="100" y1="190" x2="100" y2="202"/>
+            <line class="dim-draw d2" pathLength="100" x1="190" y1="190" x2="190" y2="202"/>
+            <line class="dim-draw d3" pathLength="100" x1="240" y1="180" x2="320" y2="180"/>
+            <line class="dim-draw d3" pathLength="100" x1="240" y1="174" x2="240" y2="186"/>
+            <line class="dim-draw d3" pathLength="100" x1="320" y1="174" x2="320" y2="186"/>
+          </g>
+          <text class="label-fade" x="70" y="172" fill="#c8cfd7" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">30</text>
+          <text class="label-fade" x="145" y="212" fill="#c8cfd7" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">65 h7</text>
+          <text class="label-fade" x="280" y="172" fill="#c8cfd7" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">55</text>
+
+          <!-- diameter callouts with leader lines -->
+          <line class="leader-draw" pathLength="100" x1="130" y1="112" x2="130" y2="70" stroke="#ff6a13" stroke-width="1" fill="none"/>
+          <circle cx="130" cy="70" r="1.6" fill="#ff6a13"/>
+          <text class="label-fade" x="106" y="60" fill="#ff6a13" font-family="IBM Plex Mono, monospace" font-size="11">⌀38 js6</text>
+
+          <line class="leader-draw" pathLength="100" x1="270" y1="118" x2="270" y2="86" stroke="#ff6a13" stroke-width="1" fill="none"/>
+          <circle cx="270" cy="118" r="1.6" fill="#ff6a13"/>
+          <text class="label-fade" x="246" y="78" fill="#ff6a13" font-family="IBM Plex Mono, monospace" font-size="11">⌀44 h6</text>
+
+          <!-- end view: outer circle traces in, crosshair spins like a probe locating centre -->
+          <g transform="translate(360,205)">
+            <circle class="dim-draw d4" pathLength="100" cx="0" cy="0" r="26" stroke="#6fa8dc" stroke-width="1.4" fill="none"/>
+            <circle cx="0" cy="0" r="9" stroke="#454c56" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+            <g class="spin-part">
+              <line x1="-30" y1="0" x2="30" y2="0" stroke="#454c56" stroke-width="0.7" stroke-dasharray="4 3"/>
+              <line x1="0" y1="-30" x2="0" y2="30" stroke="#454c56" stroke-width="0.7" stroke-dasharray="4 3"/>
+            </g>
+          </g>
+          <text class="label-fade" x="360" y="248" fill="#8b93a0" font-family="IBM Plex Mono, monospace" font-size="9" text-anchor="middle">ВИД А</text>
+
+          <!-- inspection beam sweep -->
+          <rect class="scan-beam" x="20" y="0" width="360" height="2" fill="#4f86c6"/>
+        </svg>
+        <div class="dwg-foot">
+          <div><b>Сталь 40Х</b>материал</div>
+          <div><b>Rz 10–20</b>шероховатость</div>
+          <div><b>1 шт.</b>партия ОП</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- CAPABILITIES: turning + milling -->
+  <section id="capabilities">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="kicker">ВИДЫ ОБРАБОТКИ</span>
+          <h2>Токарная и фрезерная обработка в одном производственном цикле</h2>
+        </div>
+        <p>Деталь не путешествует между подрядчиками: точение, фрезеровка, доводка и контроль — на одной площадке, под одним технологом.</p>
+      </div>
+
+      <div class="cap">
+        <div class="cap-visual">
+          <div class="shine" aria-hidden="true"></div>
+          <svg class="dwg-svg" viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg" style="--scan-h:190px;">
+            <g stroke="#6fa8dc" stroke-width="1.3" fill="none">
+              <ellipse cx="70" cy="110" rx="14" ry="46"/>
+              <g class="spin-part">
+                <line x1="70" y1="72" x2="70" y2="148" stroke-dasharray="3 4" stroke-width="1"/>
+                <line x1="58" y1="110" x2="82" y2="110" stroke-dasharray="3 4" stroke-width="1"/>
+              </g>
+              <line x1="70" y1="64" x2="300" y2="64"/>
+              <line x1="70" y1="156" x2="260" y2="156"/>
+              <line x1="300" y1="64" x2="300" y2="92"/>
+              <line x1="260" y1="156" x2="260" y2="132"/>
+              <path d="M300 92 L280 92 L280 132 L260 132" />
+            </g>
+            <g stroke="#454c56" stroke-width="1" stroke-dasharray="5 4">
+              <line x1="20" y1="110" x2="330" y2="110"/>
+            </g>
+            <!-- tool + chip: traverses the workpiece on hover -->
+            <g class="tool-travel">
+              <rect x="290" y="98" width="34" height="10" fill="#ff6a13" opacity="0.85"/>
+              <path d="M320 98 q18 -6 22 10 q-14 6 -22 -4 Z" fill="#ff6a13" opacity="0.5"/>
+            </g>
+            <g stroke="#8b93a0" stroke-width="1" fill="none">
+              <line class="dim-draw d1" pathLength="100" x1="70" y1="180" x2="300" y2="180"/>
+              <line class="dim-draw d1" pathLength="100" x1="70" y1="174" x2="70" y2="186"/>
+              <line class="dim-draw d1" pathLength="100" x1="300" y1="174" x2="300" y2="186"/>
+            </g>
+            <text class="label-fade" x="185" y="200" fill="#c8cfd7" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">L 230 мм</text>
+            <text class="label-fade" x="45" y="72" fill="#c8cfd7" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">⌀92</text>
+            <rect class="scan-beam" x="20" y="0" width="310" height="2" fill="#4f86c6"/>
+          </svg>
+        </div>
+        <div class="cap-text">
+          <span class="cap-num">01 / ТОЧЕНИЕ</span>
+          <h3>Токарная обработка на станках с ЧПУ</h3>
+          <p>Валы, втулки, фланцы, крепёж, тела вращения любой сложности — от единичного образца до серии в несколько тысяч штук.</p>
+          <ul class="leader-list">
+            <li><b>Диаметр детали</b> — от 2 до 500 мм, длина до 1200 мм</li>
+            <li><b>Токарно-фрезерные центры</b> — точение и фрезеровка за один установ</li>
+            <li><b>Резьба, канавки, конус</b> — по чертежу, без доп. наладки на аутсорсе</li>
+            <li><b>Материалы</b> — сталь, нержавейка, цветной металл, титан, пластики</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cap reverse">
+        <div class="cap-visual">
+          <div class="shine" aria-hidden="true"></div>
+          <svg class="dwg-svg" viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg" style="--scan-h:190px;">
+            <g stroke="#6fa8dc" stroke-width="1.3" fill="none">
+              <rect x="70" y="70" width="220" height="110"/>
+              <rect x="100" y="95" width="60" height="60"/>
+              <circle class="dim-draw d5" pathLength="100" cx="230" cy="125" r="26"/>
+              <rect x="190" y="150" width="40" height="16"/>
+            </g>
+            <!-- mill head: spins continuously, plunges into the part -->
+            <g class="spin-tool" stroke="#ff6a13" stroke-width="1.4" fill="none">
+              <rect x="216" y="14" width="28" height="18"/>
+              <line x1="220" y1="14" x2="220" y2="32"/>
+              <line x1="240" y1="14" x2="240" y2="32"/>
+            </g>
+            <g class="plunge">
+              <line x1="230" y1="30" x2="230" y2="70" stroke="#ff6a13" stroke-width="1.4"/>
+              <line x1="230" y1="70" x2="230" y2="99" stroke="#ff6a13" stroke-width="2.4"/>
+            </g>
+            <g stroke="#454c56" stroke-width="1" stroke-dasharray="5 4">
+              <line x1="230" y1="10" x2="230" y2="205"/>
+              <line x1="35" y1="125" x2="345" y2="125"/>
+            </g>
+            <g stroke="#8b93a0" stroke-width="1" fill="none">
+              <line class="dim-draw d1" pathLength="100" x1="70" y1="195" x2="290" y2="195"/>
+              <line class="dim-draw d1" pathLength="100" x1="70" y1="189" x2="70" y2="201"/>
+              <line class="dim-draw d1" pathLength="100" x1="290" y1="189" x2="290" y2="201"/>
+            </g>
+            <text class="label-fade" x="180" y="212" fill="#c8cfd7" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">220 × 110 мм</text>
+            <text class="label-fade" x="230" y="118" fill="#c8cfd7" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">⌀52</text>
+            <rect class="scan-beam" x="70" y="0" width="220" height="2" fill="#4f86c6"/>
+          </svg>
+        </div>
+        <div class="cap-text">
+          <span class="cap-num">02 / ФРЕЗЕРОВАНИЕ</span>
+          <h3>Фрезерная обработка: 3, 4 и 5 осей</h3>
+          <p>Корпусные детали, плиты, кронштейны, пресс-формы и детали сложной геометрии — там, где токарный станок бессилен.</p>
+          <ul class="leader-list">
+            <li><b>Рабочее поле</b> — до 1000 × 500 × 500 мм на крупных центрах</li>
+            <li><b>5-осевая обработка</b> — сложный профиль и поднутрения за один установ</li>
+            <li><b>Гравировка и маркировка</b> — серийные номера, логотипы, шкалы</li>
+            <li><b>Точность позиционирования</b> — до ±0,005 мм на чистовых переходах</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLEET / MACHINE PARK -->
+  <section id="fleet" class="fleet">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="kicker">ПАРК ОБОРУДОВАНИЯ</span>
+          <h2>Станки под разную геометрию и разный тираж</h2>
+        </div>
+        <p>От настольного прототипирования до тяжёлых деталей на горизонтально-расточных центрах — не нужно искать второго подрядчика.</p>
+      </div>
+
+      <div class="table-scroll">
+        <table class="fleet-table">
+          <thead>
+            <tr>
+              <th>Станок</th>
+              <th>Тип</th>
+              <th>Диаметр / стол</th>
+              <th>Ход по Z</th>
+              <th>Точность</th>
+              <th>Применение</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="name">Токарные с ЧПУ</td>
+              <td class="type">TURN · 2-AXIS</td>
+              <td class="mono">⌀ до 500 мм</td>
+              <td class="mono">1200 мм</td>
+              <td class="mono">±0,01 мм</td>
+              <td class="desc">Валы, втулки, фланцы, крепёж</td>
+            </tr>
+            <tr>
+              <td class="name">Токарно-фрезерные центры</td>
+              <td class="type">TURN-MILL · Y-AXIS</td>
+              <td class="mono">⌀ до 260 мм</td>
+              <td class="mono">700 мм</td>
+              <td class="mono">±0,01 мм</td>
+              <td class="desc">Сложные тела вращения с фрезерными пазами</td>
+            </tr>
+            <tr>
+              <td class="name">Вертикально-фрезерные</td>
+              <td class="type">MILL · 3-AXIS</td>
+              <td class="mono">600×400 мм</td>
+              <td class="mono">500 мм</td>
+              <td class="mono">±0,01 мм</td>
+              <td class="desc">Корпуса, плиты, кронштейны</td>
+            </tr>
+            <tr>
+              <td class="name">Обрабатывающие центры</td>
+              <td class="type">MILL · 5-AXIS</td>
+              <td class="mono">1000×500 мм</td>
+              <td class="mono">500 мм</td>
+              <td class="mono">±0,005 мм</td>
+              <td class="desc">Сложный профиль, авиационная геометрия</td>
+            </tr>
+            <tr>
+              <td class="name">Горизонтально-расточные</td>
+              <td class="type">MILL · HBM</td>
+              <td class="mono">1200×800 мм</td>
+              <td class="mono">900 мм</td>
+              <td class="mono">±0,02 мм</td>
+              <td class="desc">Крупногабаритные корпуса и рамы</td>
+            </tr>
+            <tr>
+              <td class="name">Прутковые автоматы</td>
+              <td class="type">TURN · SWISS</td>
+              <td class="mono">⌀ до 32 мм</td>
+              <td class="mono">—</td>
+              <td class="mono">±0,005 мм</td>
+              <td class="desc">Мелкосерийный крепёж и штуцеры</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="kicker">КАК МЫ РАБОТАЕМ</span>
+          <h2>От чертежа до партии на паллете — шесть шагов</h2>
+        </div>
+        <p>Никакой переписки «на словах»: каждый этап фиксируется в заказе, который вы видите у себя в почте.</p>
+      </div>
+
+      <div class="process-line" aria-hidden="true">
+        <span style="left:0%"></span><span style="left:20%"></span><span style="left:40%"></span><span style="left:60%"></span><span style="left:80%"></span><span style="left:100%"></span>
+      </div>
+
+      <div class="process-row">
+        <div class="pstep">
+          <span class="pnum">01</span>
+          <h4>Чертёж и заявка</h4>
+          <p>Присылаете чертёж (STEP, DWG, PDF) и требуемый тираж — через форму или на почту.</p>
+        </div>
+        <div class="pstep">
+          <span class="pnum">02</span>
+          <h4>Расчёт и КП</h4>
+          <p>Технолог считает маршрут обработки, срок и стоимость — обычно в течение рабочего дня.</p>
+        </div>
+        <div class="pstep">
+          <span class="pnum">03</span>
+          <h4>Программирование ЧПУ</h4>
+          <p>Пишем управляющую программу и подбираем оснастку под конкретную партию.</p>
+        </div>
+        <div class="pstep">
+          <span class="pnum">04</span>
+          <h4>Обработка</h4>
+          <p>Точение и фрезеровка на профильном оборудовании под контролем оператора.</p>
+        </div>
+        <div class="pstep">
+          <span class="pnum">05</span>
+          <h4>Контроль ОТК</h4>
+          <p>Измерение по чертежу, протокол прикладывается к партии.</p>
+        </div>
+        <div class="pstep">
+          <span class="pnum">06</span>
+          <h4>Отгрузка</h4>
+          <p>Упаковка под транспортировку и передача в вашу транспортную компанию.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- MATERIALS -->
+  <section id="materials">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="kicker">МАТЕРИАЛЫ</span>
+          <h2>Работаем с металлом и техническим пластиком</h2>
+        </div>
+        <p>Подберём марку под нагрузку и среду эксплуатации детали или обработаем материал заказчика.</p>
+      </div>
+
+      <div class="material-grid">
+        <div class="mchip"><span class="code">СТ45 / СТ20</span><span class="name">Конструкционная сталь</span><span class="use">Валы, крепёж, корпуса</span></div>
+        <div class="mchip"><span class="code">12Х18Н10Т</span><span class="name">Нержавеющая сталь</span><span class="use">Пищевое и хим. оборудование</span></div>
+        <div class="mchip"><span class="code">40Х / 40ХН</span><span class="name">Легированная сталь</span><span class="use">Нагруженные валы, шестерни</span></div>
+        <div class="mchip"><span class="code">Д16Т / АМг6</span><span class="name">Алюминиевые сплавы</span><span class="use">Корпуса, приборостроение</span></div>
+        <div class="mchip"><span class="code">ЛС59-1</span><span class="name">Латунь</span><span class="use">Арматура, декоративные детали</span></div>
+        <div class="mchip"><span class="code">ВТ1-0 / ВТ6</span><span class="name">Титановые сплавы</span><span class="use">Авиация, медицина</span></div>
+        <div class="mchip"><span class="code">POM (Delrin)</span><span class="name">Полиацеталь</span><span class="use">Втулки, шестерни, направляющие</span></div>
+        <div class="mchip"><span class="code">PTFE / Капролон</span><span class="name">Инженерный пластик</span><span class="use">Уплотнения, узлы скольжения</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUALITY -->
+  <section id="quality">
+    <div class="wrap quality">
+      <div class="quality-text">
+        <span class="kicker">КОНТРОЛЬ КАЧЕСТВА</span>
+        <h2>Каждая деталь проходит измерение перед отгрузкой</h2>
+        <p>Контроль встроен в маршрут, а не добавляется по запросу: входной контроль заготовки, промежуточный контроль после чернового прохода и финальная приёмка по чертежу.</p>
+        <ul class="qc-list">
+          <li><span class="qc-mark"></span><div><b>Координатно-измерительная машина</b>Проверка сложной геометрии и взаимного расположения поверхностей</div></li>
+          <li><span class="qc-mark"></span><div><b>Универсальный измерительный инструмент</b>Штангенциркули, микрометры, калибры, резьбовые кольца</div></li>
+          <li><span class="qc-mark"></span><div><b>Профилометр</b>Контроль шероховатости на ответственных поверхностях</div></li>
+          <li><span class="qc-mark"></span><div><b>Протокол измерений с партией</b>Фактические размеры по каждой контролируемой позиции чертежа</div></li>
+        </ul>
+      </div>
+      <div class="quality-panel">
+        <div class="dwg-head" style="margin-bottom:18px;">
+          <span>ТИПОВЫЕ ДОПУСКИ</span>
+          <span>ISO 286</span>
+        </div>
+        <div class="tol-row"><span class="lbl">Наружный диаметр (точение)</span><span class="val">h6 / h7</span></div>
+        <div class="tol-row"><span class="lbl">Отверстие (расточка)</span><span class="val">H7 / H8</span></div>
+        <div class="tol-row"><span class="lbl">Линейные размеры</span><span class="val">±0,02–0,05 мм</span></div>
+        <div class="tol-row"><span class="lbl">Плоскостность (фрезеровка)</span><span class="val">0,01 мм / 100 мм</span></div>
+        <div class="tol-row"><span class="lbl">Шероховатость чистовая</span><span class="val">Ra 0,8–1,6</span></div>
+        <div class="tol-row" style="border-bottom:none;"><span class="lbl">Прототип, минимальный тираж</span><span class="val">от 1 шт.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / CONTACT -->
+  <section id="contact" class="cta-section frame-marks">
+    <div class="wrap cta-grid">
+      <div class="cta-left">
+        <span class="kicker">ЗАЯВКА НА РАСЧЁТ</span>
+        <h2>Пришлите чертёж — вернёмся со стоимостью и сроком</h2>
+        <p>Работаем с STEP, IGES, DWG, PDF. Если чертежа пока нет — опишите деталь, поможем с технологией и материалом.</p>
+        <div class="contact-block">
+          <a href="tel:+74951234567"><span class="tag mono">ТЕЛЕФОН</span>+7 (495) 123-45-67</a>
+          <a href="mailto:zakaz@trilife-cnc.ru"><span class="tag mono">ПОЧТА</span>zakaz@trilife-cnc.ru</a>
+          <a href="#"><span class="tag mono">АДРЕС</span>Производственная площадка, г. Москва</a>
+        </div>
+      </div>
+
+      <form id="leadForm">
+        <div class="file-drop">Прикрепите чертёж детали — <b>STEP · DWG · PDF</b></div>
+        <div class="field">
+          <label for="name">Имя и компания</label>
+          <input id="name" type="text" placeholder="Иван Петров, ООО «Завод»" required>
+        </div>
+        <div class="field">
+          <label for="phone">Телефон или почта</label>
+          <input id="phone" type="text" placeholder="+7 900 000-00-00" required>
+        </div>
+        <div class="field">
+          <label for="details">Что нужно изготовить</label>
+          <textarea id="details" placeholder="Материал, тираж, требуемый срок"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Отправить на расчёт</button>
+        <p class="form-note">Ответим с предварительным расчётом в течение рабочего дня.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <a href="#top" class="logo">ТРИЛАЙФ<span class="dot">.</span></a>
+        <p style="max-width:280px; color:var(--steel); font-size:13.5px; margin-top:14px;">Токарная и фрезерная обработка металла и пластика на заказ — от прототипа до серии.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>ПРОИЗВОДСТВО</h5>
+          <ul>
+            <li><a href="#capabilities">Токарная обработка</a></li>
+            <li><a href="#capabilities">Фрезерная обработка</a></li>
+            <li><a href="#fleet">Оборудование</a></li>
+            <li><a href="#quality">Контроль качества</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>КОМПАНИЯ</h5>
+          <ul>
+            <li><a href="#process">Как мы работаем</a></li>
+            <li><a href="#materials">Материалы</a></li>
+            <li><a href="#contact">Заявка на расчёт</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Трилайф. Механическая обработка металла на заказ.</span>
+      <span class="mono">TL-CNC / MOSCOW</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // reveal the tolerance panel once, staggered, when it scrolls into view
+  var qp = document.querySelector('.quality-panel');
+  if (qp && 'IntersectionObserver' in window){
+    var qpObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          qp.classList.add('in-view');
+          qpObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.35 });
+    qpObserver.observe(qp);
+  } else if (qp){
+    qp.classList.add('in-view');
+  }
+
+  document.getElementById('leadForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var btn = this.querySelector('button');
+    var original = btn.textContent;
+    btn.textContent = 'Заявка отправлена';
+    btn.style.background = '#4f86c6';
+    setTimeout(function(){
+      btn.textContent = original;
+      btn.style.background = '';
+    }, 2600);
+  });
+</script>
+
+</body>
+</html>
