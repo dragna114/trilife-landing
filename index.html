@@ -35,6 +35,7 @@
     font-size:16px;
     line-height:1.55;
     -webkit-font-smoothing:antialiased;
+    overflow-wrap:anywhere;
   }
   img,svg{display:block; max-width:100%;}
   a{color:inherit;}
@@ -244,9 +245,7 @@
   }
   .stat{
     padding-right:20px;
-    border-right:1px solid var(--line);
   }
-  .stat:last-child{ border-right:none; }
   .stat b{
     display:block;
     font-family:'Oswald', sans-serif;
@@ -456,7 +455,7 @@
   }
 
   /* ---------- section shell ---------- */
-  section{ padding:90px 0; }
+  section{ padding:90px 0; scroll-margin-top:72px; }
   .section-head{
     display:flex;
     justify-content:space-between;
@@ -601,9 +600,8 @@
   .pstep{
     position:relative;
     padding:0 18px 0 0;
-    border-right:1px solid var(--line);
   }
-  .pstep:last-child{ border-right:none; padding-right:0; }
+  .pstep:last-child{ padding-right:0; }
   .pstep .pnum{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px;
@@ -843,20 +841,53 @@
     .cap.reverse .cap-visual{ order:1; }
     .cap.reverse .cap-text{ order:2; }
     .process-row{ grid-template-columns:repeat(3,1fr); row-gap:28px; }
-    .pstep{ border-right:none; }
-    .pstep:nth-child(3n){ border-right:none; }
     .material-grid{ grid-template-columns:repeat(2,1fr); }
     .quality{ grid-template-columns:1fr; }
     .cta-grid{ grid-template-columns:1fr; gap:36px; }
     .hero-stats{ grid-template-columns:repeat(2,1fr); row-gap:18px; max-width:100%; }
+    .hero-stats .stat:nth-child(2n){ padding-right:0; }
   }
   @media (max-width: 720px){
     .nav-links{ display:none; }
+    .nav{ height:64px; gap:12px; }
+    .logo{ font-size:20px; }
+    .logo small{ display:none; }
+    .nav-cta{ padding:9px 12px; font-size:13px; white-space:nowrap; }
     .wrap{ padding:0 18px; }
     section{ padding:64px 0; }
+    .hero{ padding:52px 0 56px; }
+    .hero-inner{ gap:30px; }
+    .part-drawing, .cap-visual{ padding:18px 14px 16px; }
+    .section-head{ margin-bottom:36px; }
+    .cap{ padding:40px 0; }
     .process-row{ grid-template-columns:1fr 1fr; }
+    .process-line{ display:none; }
     .fleet-table{ min-width:760px; }
     .footer-top{ flex-direction:column; }
+    .tol-row{ gap:18px; align-items:flex-start; }
+    .tol-row .val{ flex:none; white-space:nowrap; }
+    form{ padding:22px 18px; }
+    .contact-block a{ align-items:flex-start; }
+  }
+  @media (max-width: 480px){
+    .hero h1{ font-size:34px; }
+    .eyebrow-tag{ align-items:flex-start; font-size:11.5px; }
+    .eyebrow-tag .sw{ flex:none; margin-top:6px; }
+    .hero-actions{ flex-direction:column; }
+    .hero-actions .btn{ width:100%; justify-content:center; }
+    .hero-stats{ grid-template-columns:1fr; }
+    .hero-stats .stat{ padding:0 0 14px; border-bottom:1px solid var(--line); }
+    .hero-stats .stat:last-child{ border-bottom:none; padding-bottom:0; }
+    .process-row, .material-grid{ grid-template-columns:1fr; }
+    .pstep{ padding:0 0 22px; border-bottom:1px solid var(--line); }
+    .pstep:last-child{ border-bottom:none; padding-bottom:0; }
+    .quality-panel{ padding:20px 16px; }
+    .dwg-foot{ gap:4px; font-size:9px; overflow-wrap:normal; }
+    .dwg-foot b{ font-size:11px; }
+    .tol-row{ flex-direction:column; gap:4px; }
+    .contact-block a{ flex-direction:column; gap:2px; }
+    .contact-block a span.tag{ width:auto; }
+    .footer-cols{ gap:36px; }
   }
 </style>
 </head>
@@ -1023,7 +1054,7 @@
           <p>Валы, втулки, фланцы, крепёж, тела вращения любой сложности — от единичного образца до серии в несколько тысяч штук.</p>
           <ul class="leader-list">
             <li><b>Диаметр детали</b> — от 2 до 500 мм, длина до 1200 мм</li>
-            <li><b>Токарно-фрезерные центры</b> — точение и фрезеровка за один установ</li>
+            <li><b>Токарно-фрезерные центры</b> — точение и фрезеровка</li>
             <li><b>Резьба, канавки, конус</b> — по чертежу, без доп. наладки на аутсорсе</li>
             <li><b>Материалы</b> — сталь, нержавейка, цветной металл, титан, пластики</li>
           </ul>
@@ -1070,7 +1101,7 @@
           <p>Корпусные детали, плиты, кронштейны, пресс-формы и детали сложной геометрии — там, где токарный станок бессилен.</p>
           <ul class="leader-list">
             <li><b>Рабочее поле</b> — до 1000 × 500 × 500 мм на крупных центрах</li>
-            <li><b>5-осевая обработка</b> — сложный профиль и поднутрения за один установ</li>
+            <li><b>5-осевая обработка</b> — сложный профиль и поднутрения</li>
             <li><b>Гравировка и маркировка</b> — серийные номера, логотипы, шкалы</li>
             <li><b>Точность позиционирования</b> — до ±0,005 мм на чистовых переходах</li>
           </ul>
@@ -1270,9 +1301,9 @@
         <h2>Пришлите чертёж — вернёмся со стоимостью и сроком</h2>
         <p>Работаем с STEP, IGES, DWG, PDF. Если чертежа пока нет — опишите деталь, поможем с технологией и материалом.</p>
         <div class="contact-block">
-          <a href="tel:+74951234567"><span class="tag mono">ТЕЛЕФОН</span>+7 (495) 123-45-67</a>
+          <a href="tel:+735100000"><span class="tag mono">ТЕЛЕФОН</span>+7 (351) 000-00-00</a>
           <a href="mailto:zakaz@trilife-cnc.ru"><span class="tag mono">ПОЧТА</span>zakaz@trilife-cnc.ru</a>
-          <a href="#"><span class="tag mono">АДРЕС</span>Производственная площадка, г. Москва</a>
+          <a href="#"><span class="tag mono">АДРЕС</span>Производственная площадка, г. Челябинск</a>
         </div>
       </div>
 
@@ -1327,7 +1358,7 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 Трилайф. Механическая обработка металла на заказ.</span>
-      <span class="mono">TL-CNC / MOSCOW</span>
+      <span class="mono">TL-CNC / CHELYABINSK</span>
     </div>
   </div>
 </footer>
